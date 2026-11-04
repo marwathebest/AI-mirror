@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#020205" />
+    <meta name="description" content="بوابة سحرية تنقلك لعالم ثاني وتغيّر شكلك ولبسك." />
+    <title>بوابة عالم آخر</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <video id="camera" class="hidden-video" playsinline muted></video>
+    <video id="ai" class="hidden-video" playsinline muted></video>
+    <canvas id="stage" aria-label="البوابة"></canvas>
+
+    <header class="top">
+      <div class="title">
+        <h1>بوابة عالم آخر</h1>
+        <p id="hint"></p>
+      </div>
+      <button id="fullscreen" class="icon-button" type="button" aria-label="ملء الشاشة">⛶</button>
+    </header>
+
+    <div id="toast" class="toast" role="status"></div>
+    <div id="status" class="status" role="status" hidden></div>
+
+    <footer class="bottom">
+      <div class="gestures">
+        <span>✌️ عالم ثاني</span>
+        <div id="gesture-meter" class="gesture-meter" aria-hidden="true"></div>
+      </div>
+    </footer>
+
+    <section class="attract" aria-hidden="true">
+      <div class="attract-card">
+        <p class="attract-kicker">✨ البوابة نايمة ✨</p>
+        <h2>مُرّ قدّامها</h2>
+        <p>وشوف نفسك في عالم ثاني</p>
+      </div>
+    </section>
+
+    <section id="loading" class="overlay">
+      <div class="spinner"></div>
+      <p id="loading-text">جاري تجهيز البوابة…</p>
+    </section>
+
+    <section id="camera-error" class="overlay" hidden>
+      <p>ما قدرنا نشغّل الكاميرا 📷</p>
+      <p id="camera-error-reason" class="small"></p>
+    </section>
+
+    <script>
+      // Opening index.html straight from the folder can't load the app; point to the server instead.
+      if (location.protocol === "file:") {
+        document.getElementById("loading-text").textContent =
+          "لازم تشغّلين السيرفر: افتحي مجلد AI-mirror في الترمنال واكتبي npm start ثم افتحي http://localhost:3000";
+      }
+    </script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

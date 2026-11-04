@@ -1,0 +1,262 @@
+:root {
+  --night: #020205;
+  --accent: #a78bfa;
+  --white: #ffffff;
+  --glass: rgba(10, 10, 20, 0.55);
+  --glass-line: rgba(255, 255, 255, 0.16);
+  --font: system-ui, "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--white);
+  font-family: var(--font);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.hidden-video {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- top bar ---------- */
+
+.top {
+  position: fixed;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: max(16px, env(safe-area-inset-top)) 20px 28px;
+  background: linear-gradient(to bottom, rgba(2, 2, 5, 0.7), transparent);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: clamp(1.3rem, 3.6vmin, 2.2rem);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.title p {
+  margin: 2px 0 0;
+  color: var(--accent);
+  font-size: clamp(0.95rem, 2.4vmin, 1.4rem);
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--glass-line);
+  border-radius: 50%;
+  background: var(--glass);
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+/* ---------- world name toast ---------- */
+
+.toast {
+  position: fixed;
+  top: 16%;
+  left: 50%;
+  padding: 14px 34px;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(12px);
+  font-size: clamp(1.6rem, 6vmin, 3.2rem);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 10px) scale(0.9);
+  pointer-events: none;
+}
+
+.toast.show {
+  animation: toast 1.6s ease forwards;
+}
+
+@keyframes toast {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.9); }
+  15%, 75% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -10px) scale(1); }
+}
+
+/* ---------- AI connection status ---------- */
+
+.status {
+  position: fixed;
+  bottom: clamp(70px, 12vmin, 120px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 12px 28px;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(12px);
+  font-size: clamp(1.05rem, 3vmin, 1.7rem);
+  text-align: center;
+  animation: breathe 1.8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% { box-shadow: 0 0 40px rgba(167, 139, 250, 0.6); }
+}
+
+/* ---------- bottom hint ---------- */
+
+.bottom {
+  position: fixed;
+  inset: auto 0 0;
+  padding: 24px 16px max(18px, env(safe-area-inset-bottom));
+  transition: opacity 0.4s;
+}
+
+.gestures {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  font-size: clamp(0.9rem, 2.2vmin, 1.25rem);
+  opacity: 0.75;
+}
+
+.gesture-meter {
+  --progress: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--progress) * 360deg), rgba(255, 255, 255, 0.15) 0);
+  mask: radial-gradient(circle, transparent 52%, #000 54%);
+}
+
+/* ---------- idle attract screen ---------- */
+
+.attract {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+
+body.idle .attract {
+  opacity: 1;
+}
+
+body.idle .bottom,
+body.idle .toast,
+body.idle .title p {
+  opacity: 0;
+}
+
+.attract-card {
+  margin-top: 46vh;
+  text-align: center;
+  animation: float 3s ease-in-out infinite;
+}
+
+.attract-card h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 8vmin, 5rem);
+  font-weight: 400;
+  background: linear-gradient(90deg, #a78bfa, #67e8f9, #f0abfc, #a78bfa);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+.attract-card p {
+  margin: 6px 0 0;
+  font-size: clamp(1.05rem, 3.2vmin, 1.8rem);
+}
+
+.attract-kicker {
+  color: var(--accent);
+}
+
+@keyframes float {
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+  to { background-position: 300% 0; }
+}
+
+/* ---------- loading & errors ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--night);
+  text-align: center;
+  font-size: clamp(1.2rem, 3.4vmin, 1.8rem);
+}
+
+.overlay p {
+  margin: 0;
+}
+
+.overlay .small {
+  font-size: 0.75em;
+  opacity: 0.75;
+}
+
+.spinner {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: conic-gradient(#a78bfa, #67e8f9, #f0abfc, #a78bfa);
+  mask: radial-gradient(circle, transparent 55%, #000 57%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+[hidden] {
+  display: none !important;
+}
