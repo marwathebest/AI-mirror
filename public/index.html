@@ -18,6 +18,7 @@
         <h1>بوابة عالم آخر</h1>
         <p id="hint"></p>
       </div>
+      <button id="edit-prompt" class="text-button" type="button" hidden>غيّر التحوّل</button>
       <button id="fullscreen" class="icon-button" type="button" aria-label="ملء الشاشة">⛶</button>
     </header>
 
@@ -42,6 +43,30 @@
     <section id="loading" class="overlay">
       <div class="spinner"></div>
       <p id="loading-text">جاري تجهيز البوابة…</p>
+    </section>
+
+    <section id="prompt-screen" class="overlay prompt-screen" hidden>
+      <form id="prompt-form" class="prompt-card">
+        <p class="prompt-kicker">AI MIRROR</p>
+        <h2>من تريد أن تصبح؟</h2>
+        <p class="prompt-copy">صف الشخصية والعالم بالتفصيل، وسنحوّل وجهك وشعرك وملابسك والخلفية مع إبقاء حركتك حيّة.</p>
+        <label for="prompt-input">وصف التحوّل</label>
+        <textarea id="prompt-input" maxlength="700" required placeholder="مثال: محارب من عالم الجليد، وجه بلوري، شعر أبيض متطاير، درع أزرق مضيء وخلفه قلعة وسط عاصفة ثلجية"></textarea>
+        <div class="suggestions" aria-label="اقتراحات جاهزة">
+          <p>أو اختر تحوّلًا جاهزًا</p>
+          <div class="suggestion-grid">
+            <button type="button" class="suggestion" data-prompt="محارب جليدي أسطوري، وجه مصنوع من بلورات زرقاء شفافة، عينان متوهجتان، شعر أبيض طويل يتطاير، درع ملكي من الثلج والكريستال، وخلفه قلعة جليدية وسط عاصفة ثلجية سينمائية">❄️ محارب الجليد</button>
+            <button type="button" class="suggestion" data-prompt="أميرة سايبربانك مستقبلية، وجه بتفاصيل نيون بنفسجية وزرقاء، شعر معدني مضيء، درع تقني فاخر، وخلفها مدينة مستقبلية ليلية مليئة بالهولوغرام والمطر، إضاءة سينمائية شديدة الوضوح">⚡ أميرة السايبربانك</button>
+            <button type="button" class="suggestion" data-prompt="حارس غابة سحري من سلالة الإلف، ملامح خيالية وعيون خضراء متوهجة، شعر من الأوراق والزهور، درع من الكروم والذهب، وخلفه غابة قديمة مليئة باليراعات والضباب السحري">🌿 حارس الغابة</button>
+            <button type="button" class="suggestion" data-prompt="ملك النار الأسطوري، وجه من حجر بركاني تتخلله شقوق حمم متوهجة، شعر من اللهب، تاج أسود ضخم، درع بركاني ملكي، وخلفه براكين وأنهار حمم وشرر متطاير">🔥 ملك النار</button>
+            <button type="button" class="suggestion" data-prompt="ملكة مملكة تحت البحر، بشرة لؤلؤية وملامح خيالية، شعر أزرق طويل يطفو في الماء، تاج من المرجان واللؤلؤ، درع من الحراشف اللامعة، وخلفها قصر بحري مضيء وأسماك استوائية">🪸 ملكة البحر</button>
+            <button type="button" class="suggestion" data-prompt="روبوت ملكي فاخر من الذهب والزجاج الأسود، وجه آلي أنيق بعيون زرقاء متوهجة، تفاصيل ميكانيكية دقيقة، عباءة ملكية مستقبلية، وخلفه قصر تقني ضخم بإضاءة سينمائية">🤖 الروبوت الملكي</button>
+          </div>
+        </div>
+        <div id="prompt-error" class="prompt-error" role="alert"></div>
+        <button class="portal-button" type="submit">افتح البوابة</button>
+        <p class="privacy-note">يُستخدم بث الكاميرا للتحويل الحي، ولا نعرض صورتها الأصلية داخل البوابة.</p>
+      </form>
     </section>
 
     <section id="camera-error" class="overlay" hidden>

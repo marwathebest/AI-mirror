@@ -43,6 +43,8 @@ const state = {
   open: 0,
   held: { name: null, since: 0 },
   cooldownUntil: 0,
+  armed: false,
+  userPrompt: "",
 };
 
 /* ---------- geometry ---------- */
@@ -121,9 +123,14 @@ function drawRidge(c, base, height, color, t = 0) {
 // Each prompt rebuilds the whole person (face, hair, skin, clothes) and the scene behind them.
 const TRANSFORM = "Completely transform the person into a fantasy character so their real face, hair and clothes are no longer recognizable, keeping only their pose and movement.";
 
+function activePrompt() {
+  if (!state.userPrompt) return worlds[state.world].prompt;
+  return `${TRANSFORM} Transform them according to this creative direction: ${state.userPrompt}. Replace the entire background to match. Keep the result visually coherent and temporally consistent from frame to frame. Do not preserve the person's real identity.`;
+}
+
 const worlds = [
   {
-    name: "الفضاء",
+    name: "المستكشف الكوني",
     icon: "🪐",
     glow: "#8b5cf6",
     ring: ["#a78bfa", "#f0abfc", "#67e8f9"],
@@ -334,7 +341,12 @@ const worlds = [
 
 const decart = createDecartClient({
   apiKeyProvider: async () => {
-    const response = await fetch("/api/realtime-token", { method: "POST" });
+    let response;
+    try {
+      response = await fetch("/api/realtime-token", { method: "POST" });
+    } catch {
+      throw new Error("السيرفر غير متصل. شغّلي npm start واتركي نافذة الترمنال مفتوحة، ثم حدّثي الصفحة.");
+    }
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`);
     return body.apiKey;
@@ -361,7 +373,7 @@ async function startAI() {
         aiVideo.srcObject = stream;
         aiVideo.play().catch(() => {});
       },
-      initialState: { prompt: { text: worlds[state.world].prompt, enhance: true } },
+      initialState: { prompt: { text: activePrompt(), enhance: true } },
     });
     if (id !== ai.id) {
       session.disconnect();
@@ -380,7 +392,12 @@ async function startAI() {
     });
   } catch (error) {
     console.error(error);
-    if (id === ai.id) showStatus(error.message || "تعذّر الاتصال بالذكاء الاصطناعي");
+    if (id === ai.id) {
+      const message = error?.message === "Failed to fetch"
+        ? "تعذّر الوصول إلى Decart. تحققي من الإنترنت أو جرّبي شبكة أخرى، ثم حدّثي الصفحة."
+        : error?.message;
+      showStatus(message || "تعذّر الاتصال بالذكاء الاصطناعي");
+    }
   } finally {
     if (id === ai.id) ai.starting = false;
   }
@@ -559,7 +576,7 @@ function setWorld(index, announce = true) {
   state.world = (index + worlds.length) % worlds.length;
   const world = worlds[state.world];
   hint.textContent = `${world.icon} ${world.name}`;
-  ai.session?.setPrompt(world.prompt, { enhance: true });
+  ai.session?.setPrompt(activePrompt(), { enhance: true });
   if (announce) {
     toast.textContent = `${world.icon} ${world.name}`;
     toast.classList.remove("show");
@@ -579,6 +596,7 @@ function showOverlay(id, visible) {
 const gestureMeter = $("#gesture-meter");
 
 function handleGestures(result, now) {
+  if (state.userPrompt) return;
   const names = (result?.gestures || [])
     .map((list) => list[0])
     .filter((top) => top && top.score > 0.6)
@@ -635,7 +653,7 @@ function updatePortal(now, dt) {
   if (here) state.lastSeen = now;
   const present = now - state.lastSeen < CLOSE_AFTER_MS;
 
-  if (present && !state.visiting && !state.expired) {
+  if (state.armed && present && !state.visiting && !state.expired) {
     state.visiting = true;
     state.visitStart = now;
     setWorld(state.world + 1);
@@ -685,11 +703,22 @@ function loop() {
   drawRing(world, shape, state.time, dt);
 }
 
-async function start() {
+function start() {
   resize();
   setWorld(worlds.length - 1, false);
   window.addEventListener("resize", resize);
   window.addEventListener("beforeunload", stopAI);
+  showOverlay("#loading", false);
+  showOverlay("#prompt-screen", true);
+}
+
+let experienceReady = false;
+let experienceStarting = false;
+
+async function initializeExperience() {
+  if (experienceReady || experienceStarting) return experienceReady;
+  experienceStarting = true;
+  showOverlay("#loading", true);
 
   try {
     await openCamera();
@@ -704,7 +733,8 @@ async function start() {
       reasons[error.name] || (window.isSecureContext ? `${error.name}: ${error.message}` : "افتحي الصفحة من http://localhost:3000 عشان الكاميرا تشتغل.");
     showOverlay("#loading", false);
     showOverlay("#camera-error", true);
-    return;
+    experienceStarting = false;
+    return false;
   }
 
   try {
@@ -725,12 +755,56 @@ async function start() {
   } catch (error) {
     console.error(error);
     $("#loading-text").textContent = "تعذّر تحميل الذكاء الاصطناعي. تأكد من الاتصال بالإنترنت ثم حدّث الصفحة.";
-    return;
+    experienceStarting = false;
+    return false;
   }
 
+  experienceReady = true;
+  experienceStarting = false;
   showOverlay("#loading", false);
   loop();
+  return true;
 }
+
+const promptForm = $("#prompt-form");
+const promptInput = $("#prompt-input");
+const promptError = $("#prompt-error");
+const editPrompt = $("#edit-prompt");
+
+document.querySelectorAll(".suggestion").forEach((button) => {
+  button.addEventListener("click", () => {
+    promptInput.value = button.dataset.prompt;
+    promptForm.requestSubmit();
+  });
+});
+
+promptForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const value = promptInput.value.trim();
+  if (value.length < 12) {
+    promptError.textContent = "اكتب وصفًا أوضح للشخصية والملابس والعالم.";
+    promptInput.focus();
+    return;
+  }
+  state.userPrompt = value;
+  state.armed = true;
+  promptError.textContent = "";
+  hint.textContent = "✨ تحوّلك الخاص";
+  showOverlay("#prompt-screen", false);
+  $(".bottom").hidden = true;
+  editPrompt.hidden = false;
+  if (!(await initializeExperience())) return;
+  if (performance.now() - state.lastSeen < CLOSE_AFTER_MS) startAI();
+});
+
+editPrompt.addEventListener("click", () => {
+  state.armed = false;
+  state.visiting = false;
+  stopAI();
+  editPrompt.hidden = true;
+  showOverlay("#prompt-screen", true);
+  promptInput.focus();
+});
 
 $("#fullscreen").addEventListener("click", () => {
   if (document.fullscreenElement) document.exitFullscreen();

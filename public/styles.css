@@ -85,6 +85,15 @@ button {
   opacity: 0.6;
 }
 
+.text-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: var(--glass);
+  font-size: clamp(0.8rem, 1.8vmin, 1rem);
+}
+
 /* ---------- world name toast ---------- */
 
 .toast {
@@ -237,6 +246,129 @@ body.idle .title p {
 
 .overlay p {
   margin: 0;
+}
+
+.prompt-screen {
+  z-index: 20;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(139, 92, 246, 0.22), transparent 38%),
+    radial-gradient(circle at 20% 80%, rgba(34, 211, 238, 0.12), transparent 32%),
+    #020205;
+}
+
+.prompt-card {
+  width: min(620px, calc(100vw - 32px));
+  display: grid;
+  gap: 10px;
+  padding: clamp(20px, 3.5vw, 34px);
+  border: 1px solid var(--glass-line);
+  border-radius: 28px;
+  background: rgba(10, 10, 20, 0.72);
+  box-shadow: 0 0 80px rgba(139, 92, 246, 0.18);
+  backdrop-filter: blur(20px);
+  text-align: right;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+.prompt-card h2 {
+  margin: 0;
+  font-size: clamp(2rem, 7vmin, 4rem);
+  font-weight: 450;
+  line-height: 1.05;
+}
+
+.prompt-card .prompt-kicker {
+  color: #a78bfa;
+  font-size: 0.8rem;
+  letter-spacing: 0.24em;
+}
+
+.prompt-card .prompt-copy,
+.prompt-card .privacy-note {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+}
+
+.prompt-card label {
+  margin-top: 6px;
+  font-size: 0.95rem;
+}
+
+.prompt-card textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  font: inherit;
+  line-height: 1.7;
+  user-select: text;
+}
+
+.prompt-card textarea:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.14);
+}
+
+.suggestions > p {
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+}
+
+.suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.suggestion {
+  min-height: 46px;
+  padding: 9px 12px;
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  border-radius: 13px;
+  background: rgba(139, 92, 246, 0.09);
+  text-align: right;
+  font-size: clamp(0.78rem, 1.8vmin, 0.95rem);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.suggestion:hover,
+.suggestion:focus-visible {
+  transform: translateY(-2px);
+  border-color: #a78bfa;
+  background: rgba(139, 92, 246, 0.2);
+  outline: none;
+}
+
+@media (max-width: 520px) {
+  .suggestion-grid { grid-template-columns: 1fr; }
+  .prompt-card textarea { min-height: 110px; }
+}
+
+.portal-button {
+  min-height: 54px;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #7c3aed, #2563eb, #0891b2);
+  font-weight: 700;
+  box-shadow: 0 12px 36px rgba(124, 58, 237, 0.3);
+}
+
+.prompt-error {
+  min-height: 1.2em;
+  color: #fda4af;
+  font-size: 0.88rem;
+}
+
+.prompt-card .privacy-note {
+  font-size: 0.75rem;
+  text-align: center;
 }
 
 .overlay .small {
